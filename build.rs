@@ -18,5 +18,5 @@ fn main() {
 
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rustc-env=TARGET=release");
-    println!("cargo::warning=Export C++ headers");
+    println!("cargo:warning=Export C++ headers to cxxbridge/{}/src", crate_name);
 }
