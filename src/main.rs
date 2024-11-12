@@ -3,3 +3,7 @@ mod ffi {
     extern "Rust" {
     }
 }
+
+fn main() {
+    
+}
