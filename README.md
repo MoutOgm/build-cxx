@@ -34,7 +34,7 @@ cd build-cxx
 
 If you are cloning this repository into an existing Git repository, remove the .git directory:
 ```sh
-rm -rf build-cxx/.git
+rm -rf build-cxx/.git*
 ```
 
 ### Dependencies
