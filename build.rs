@@ -19,7 +19,7 @@ fn main() {
     let crate_name = env!("CARGO_PKG_NAME");
 
     // Compilation CXX
-    cxx_build::bridge("src/main.rs")
+    cxx_build::bridge("src/lib.rs")
         .std("c++17")
         .compile(&crate_name);
 
@@ -27,7 +27,7 @@ fn main() {
     println!("cargo:warning=Root dir: {}", root_dir.display());
 
     // Chemins source et destination
-    let src = root_dir.join(format!("target/cxxbridge/{}/src/main.rs.h", crate_name));
+    let src = root_dir.join(format!("target/cxxbridge/{}/src/lib.rs.h", crate_name));
     let dst_dir = root_dir.join("target/cxxbridge");
     let dst = dst_dir.join(format!("{}.hpp", crate_name));
 
