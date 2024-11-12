@@ -1,22 +1,44 @@
 use std::fs;
 use std::path::PathBuf;
 
+fn get_root_dir() -> PathBuf {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    // Vérifie si un Cargo.toml de workspace existe dans le dossier parent
+    let possible_workspace = manifest_dir.parent().unwrap().join("Cargo.toml");
+    if possible_workspace.exists() && fs::read_to_string(&possible_workspace)
+        .map(|content| content.contains("[workspace]"))
+        .unwrap_or(false)
+    {
+        manifest_dir.parent().unwrap().to_path_buf()
+    } else {
+        manifest_dir
+    }
+}
+
 fn main() {
     let crate_name = env!("CARGO_PKG_NAME");
-    let _build = cxx_build::bridge("src/main.rs")
-        .std("c++17");
 
-    // Get the root directory of the crate
-    let crate_root = env!("CARGO_MANIFEST_DIR");
+    // Compilation CXX
+    cxx_build::bridge("src/lib.rs")
+        .std("c++17")
+        .compile(&crate_name);
 
-    // Define your source and destination paths relative to the crate root
-    let src = PathBuf::from(crate_root).join(format!("target/cxxbridge/{}/src/main.rs.h", crate_name));
-    let dst = PathBuf::from(crate_root).join(format!("target/cxxbridge/{}.hpp", crate_name));
+    let root_dir = get_root_dir();
+    println!("cargo:warning=Root dir: {}", root_dir.display());
 
-    // Copy the file
-    fs::copy(&src, &dst).expect("Failed to copy file");
+    // Chemins source et destination
+    let src = root_dir.join(format!("target/cxxbridge/{}/src/lib.rs.h", crate_name));
+    let dst_dir = root_dir.join("target/cxxbridge");
+    let dst = dst_dir.join(format!("{}.hpp", crate_name));
 
-    println!("cargo:rerun-if-changed=src/main.rs");
+    // Copier le fichier
+    if src.exists() {
+        fs::copy(&src, &dst).expect("Échec de la copie");
+        println!("cargo:warning=Fichier copié : {} -> {}", src.display(), dst.display());
+    } else {
+        println!("cargo:warning=Fichier source non trouvé: {}", src.display());
+    }
+
+    println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rustc-env=TARGET=release");
-    println!("cargo:warning=Export C++ headers to cxxbridge/{}/src", crate_name);
 }
