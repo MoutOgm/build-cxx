@@ -32,6 +32,11 @@ git clone --branch lib --depth 1 https://github.com/MoutOgm/build-cxx.git
 cd build-cxx
 ```
 
+If you are cloning this repository into an existing Git repository, remove the .git directory:
+```sh
+rm -rf build-cxx/.git
+```
+
 ### Dependencies
 
 Ensure you have the following dependencies specified in your `Cargo.toml` file:
